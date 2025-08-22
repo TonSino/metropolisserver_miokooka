@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>YouTube Playlist Shuffle Player</title>
+  <title>YouTube Playlist Shuffle Player (ミュート確認用)</title>
   <style>
     html, body, #player {height:100%; margin:0; padding:0; background:#000;}
     #player {width:100%; height:100%;}
@@ -26,7 +26,7 @@
           listType: 'playlist',
           list: PLAYLIST_ID,
           autoplay: 1,
-          mute: 1,
+          mute: 1,        // ミュートで自動再生
           loop: 1,
           playlist: PLAYLIST_ID,
           controls: 1,
@@ -41,44 +41,18 @@
     }
 
     function onPlayerReady(event) {
-      // まずミュート
       player.mute();
-
-      // 再生開始のタイミングで自動音声ON
-      setTimeout(() => {
-        try {
-          player.unMute();
-          player.setVolume(100);
-          // もう一度再生を保証
-          if(player.getPlayerState() !== YT.PlayerState.PLAYING) {
-            player.playVideo();
-          }
-        } catch(e) {
-          console.warn('音声ONエラー:', e);
-        }
-      }, 2000); // 2秒後に実行
+      player.playVideo(); // ミュートで再生開始
     }
 
     function onPlayerStateChange(event) {
-      // 最初の再生時にシャッフルON
       if (!hasShuffled && event.data === YT.PlayerState.PLAYING) {
         try {
-          player.setShuffle(true);
-          player.playVideoAt(0);
-        } catch(e) { console.warn('setShuffleエラー:', e); }
+          player.setShuffle(true); // シャッフルON
+        } catch(e){console.warn('setShuffleエラー', e);}
         hasShuffled = true;
       }
     }
-
-    // Wキーでも音声ON可能
-    window.addEventListener('keydown', (e) => {
-      if (e.key.toLowerCase() === 'w') {
-        try {
-          player.unMute();
-          player.setVolume(100);
-        } catch(e) {}
-      }
-    });
   </script>
 </body>
 </html>
