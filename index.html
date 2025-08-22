@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>YouTube Playlist Shuffle Player (自動1秒後音声ON)</title>
+  <title>YouTube Playlist Shuffle Player</title>
   <style>
-    html,body,#player{height:100%;margin:0;padding:0;background:#000}
-    #player{width:100%;height:100%}
+    html, body, #player {height:100%; margin:0; padding:0; background:#000;}
+    #player {width:100%; height:100%;}
   </style>
 </head>
 <body>
@@ -41,20 +41,31 @@
     }
 
     function onPlayerReady(event) {
+      // まずミュート
       player.mute();
-      // 開始2秒後にミュート解除
+
+      // 再生開始のタイミングで自動音声ON
       setTimeout(() => {
-        player.unMute();
-        player.setVolume(100);
-      }, 2000);
+        try {
+          player.unMute();
+          player.setVolume(100);
+          // もう一度再生を保証
+          if(player.getPlayerState() !== YT.PlayerState.PLAYING) {
+            player.playVideo();
+          }
+        } catch(e) {
+          console.warn('音声ONエラー:', e);
+        }
+      }, 1000); // 1秒後に実行
     }
 
     function onPlayerStateChange(event) {
+      // 最初の再生時にシャッフルON
       if (!hasShuffled && event.data === YT.PlayerState.PLAYING) {
         try {
           player.setShuffle(true);
           player.playVideoAt(0);
-        } catch (e) { console.warn('setShuffleエラー:', e); }
+        } catch(e) { console.warn('setShuffleエラー:', e); }
         hasShuffled = true;
       }
     }
@@ -62,8 +73,10 @@
     // Wキーでも音声ON可能
     window.addEventListener('keydown', (e) => {
       if (e.key.toLowerCase() === 'w') {
-        player.unMute();
-        player.setVolume(100);
+        try {
+          player.unMute();
+          player.setVolume(100);
+        } catch(e) {}
       }
     });
   </script>
