@@ -1,58 +1,76 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>YouTube Playlist Shuffle Player (ミュート確認用)</title>
-  <style>
-    html, body, #player {height:100%; margin:0; padding:0; background:#000;}
-    #player {width:100%; height:100%;}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>YouTube Playlist Shuffle Player (自動1秒後音声ON)</title>
+<style>
+html,body,#player{height:100%;margin:0;padding:0;background:#000}
+#player{width:100%;height:100%}
+</style>
 </head>
 <body>
-  <div id="player"></div>
+<div id="player"></div>
 
-  <script src="https://www.youtube.com/iframe_api"></script>
-  <script>
-    const PLAYLIST_ID = 'PLL2AVTmMsDGvnk7808wSOCidie8C7b9i7';
-    let player;
-    let hasShuffled = false;
 
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player('player', {
-        width: '100%',
-        height: '100%',
-        playerVars: {
-          listType: 'playlist',
-          list: PLAYLIST_ID,
-          autoplay: 1,
-          mute: 1,        // ミュートで自動再生
-          loop: 1,
-          playlist: PLAYLIST_ID,
-          controls: 1,
-          rel: 0,
-          modestbranding: 1
-        },
-        events: {
-          onReady: onPlayerReady,
-          onStateChange: onPlayerStateChange
-        }
-      });
-    }
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+const PLAYLIST_ID = 'PLL2AVTmMsDGvnk7808wSOCidie8C7b9i7';
+let player;
+let hasShuffled = false;
 
-    function onPlayerReady(event) {
-      player.mute();
-      player.playVideo(); // ミュートで再生開始
-    }
 
-    function onPlayerStateChange(event) {
-      if (!hasShuffled && event.data === YT.PlayerState.PLAYING) {
-        try {
-          player.setShuffle(true); // シャッフルON
-        } catch(e){console.warn('setShuffleエラー', e);}
-        hasShuffled = true;
-      }
-    }
-  </script>
+function onYouTubeIframeAPIReady() {
+player = new YT.Player('player', {
+width: '100%',
+height: '100%',
+playerVars: {
+listType: 'playlist',
+list: PLAYLIST_ID,
+autoplay: 1,
+mute: 1,
+loop: 1,
+playlist: PLAYLIST_ID,
+controls: 1,
+rel: 0,
+modestbranding: 1
+},
+events: {
+onReady: onPlayerReady,
+onStateChange: onPlayerStateChange
+}
+});
+}
+
+
+function onPlayerReady(event) {
+player.mute();
+// 開始2秒後にミュート解除
+setTimeout(() => {
+player.unMute();
+player.setVolume(100);
+}, 2000);
+}
+
+
+function onPlayerStateChange(event) {
+if (!hasShuffled && event.data === YT.PlayerState.PLAYING) {
+try {
+player.setShuffle(true);
+player.playVideoAt(0);
+} catch (e) { console.warn('setShuffleエラー:', e); }
+hasShuffled = true;
+}
+}
+
+
+// Wキーでも音声ON可能
+window.addEventListener('keydown', (e) => {
+if (e.key.toLowerCase() === 'w') {
+player.unMute();
+player.setVolume(100);
+}
+});
+</script>
 </body>
 </html>
