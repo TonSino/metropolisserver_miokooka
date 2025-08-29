@@ -49,6 +49,10 @@
       });
     }
 
+    function onPlayerReady(event) {
+      player.mute(); // ミュートを維持
+    }
+    
     function onPlayerStateChange(event) {
       if (!hasShuffled && event.data === YT.PlayerState.PLAYING) {
         try {
@@ -58,13 +62,6 @@
         hasShuffled = true;
       }
     }
-
-    window.addEventListener('keydown', (e) => {
-      if (e.key.toLowerCase() === 'w') {
-        player.unMute();
-        player.setVolume(100);
-      }
-    });
   </script>
 </body>
 </html>
