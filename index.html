@@ -49,14 +49,6 @@
       });
     }
 
-    function onPlayerReady(event) {
-      player.mute();
-      setTimeout(() => {
-        player.unMute();
-        player.setVolume(100);
-      }, 2000);
-    }
-
     function onPlayerStateChange(event) {
       if (!hasShuffled && event.data === YT.PlayerState.PLAYING) {
         try {
